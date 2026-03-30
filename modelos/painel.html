@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block conteudo_principal %}
+<div class="grid grid-cols-4 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+        <p class="text-slate-500 font-medium text-sm">Total Físico</p>
+        <p class="text-2xl font-black mt-2">{{ metricas.total_itens }} un.</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
+        <p class="text-slate-500 font-medium text-sm">Investimento</p>
+        <p class="text-2xl font-black mt-2">R$ {{ "%.2f"|format(metricas.investimento) }}</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-purple-500">
+        <p class="text-slate-500 font-medium text-sm">Lucro Projetado</p>
+        <p class="text-2xl font-black mt-2">R$ {{ "%.2f"|format(metricas.lucro) }}</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
+        <p class="text-slate-500 font-medium text-sm">Alertas de Reposição</p>
+        <p class="text-2xl font-black mt-2 text-red-500">{{ metricas.alertas }} itens</p>
+    </div>
+</div>
+
+<div class="bg-white p-6 rounded-xl shadow-sm mb-8">
+    <h3 class="text-lg font-bold mb-4 border-b pb-2">Registrar Item</h3>
+    <form action="/registrar" method="POST" class="grid grid-cols-7 gap-4 items-end">
+        <div class="col-span-1">
+            <label class="block text-xs font-medium mb-1">Código</label>
+            <input type="text" name="codigo_produto" required class="w-full border p-2 rounded focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+        </div>
+        <div class="col-span-2">
+            <label class="block text-xs font-medium mb-1">Produto</label>
+            <input type="text" name="nome_produto" required class="w-full border p-2 rounded focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+        </div>
+        <div class="col-span-1">
+            <label class="block text-xs font-medium mb-1">Categoria</label>
+            <select name="identificador_categoria" class="w-full border p-2 rounded bg-white text-sm">
+                {% for cat in categorias %}
+                <option value="{{ cat.identificador }}">{{ cat.nome_categoria }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-span-1">
+            <label class="block text-xs font-medium mb-1">Qtd / Min</label>
+            <div class="flex gap-1">
+                <input type="number" name="quantidade_atual" required class="w-full border p-2 rounded focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                <input type="number" name="estoque_minimo" required class="w-full border p-2 rounded focus:ring-2 focus:ring-emerald-500 outline-none text-sm" value="5">
+            </div>
+        </div>
+        <div class="col-span-1">
+            <label class="block text-xs font-medium mb-1">Custo (R$)</label>
+            <input type="number" step="0.01" name="preco_custo" required class="w-full border p-2 rounded focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+        </div>
+        <div class="col-span-1">
+            <label class="block text-xs font-medium mb-1">Venda (R$)</label>
+            <input type="number" step="0.01" name="preco_venda" required class="w-full border p-2 rounded focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+        </div>
+        <div class="col-span-7 mt-2">
+            <button type="submit" class="w-full bg-slate-900 text-white font-bold py-2 rounded hover:bg-slate-800 transition shadow-md text-sm">
+                Salvar
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <table class="w-full text-left border-collapse">
+        <thead class="bg-slate-50 border-b">
+            <tr>
+                <th class="p-4 font-semibold text-slate-600 text-sm">Código</th>
+                <th class="p-4 font-semibold text-slate-600 text-sm">Produto</th>
+                <th class="p-4 font-semibold text-slate-600 text-sm">Categoria</th>
+                <th class="p-4 font-semibold text-slate-600 text-center text-sm">Estoque</th>
+                <th class="p-4 font-semibold text-slate-600 text-right text-sm">Custo / Venda</th>
+                <th class="p-4 font-semibold text-slate-600 text-center text-sm">Ação</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for item in produtos %}
+            <tr class="hover:bg-slate-50 transition">
+                <td class="p-4 text-slate-500 text-sm">{{ item.codigo_produto }}</td>
+                <td class="p-4 font-bold text-sm">{{ item.nome_produto }}</td>
+                <td class="p-4 text-sm"><span class="bg-slate-200 px-2 py-1 rounded text-slate-700">{{ item.nome_categoria }}</span></td>
+                <td class="p-4 text-center">
+                    <span class="font-bold px-3 py-1 rounded-full text-xs {% if item.quantidade_atual <= item.estoque_minimo %}bg-red-100 text-red-700{% else %}bg-emerald-100 text-emerald-700{% endif %}">
+                        {{ item.quantidade_atual }}
+                    </span>
+                </td>
+                <td class="p-4 text-right text-sm">
+                    <span class="text-slate-400 block">R$ {{ item.preco_custo }}</span>
+                    <span class="font-semibold text-emerald-600 block">R$ {{ item.preco_venda }}</span>
+                </td>
+                <td class="p-4 text-center">
+                    <a href="/excluir/{{ item.identificador }}" class="text-red-500 hover:text-red-700 font-bold text-sm">X</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

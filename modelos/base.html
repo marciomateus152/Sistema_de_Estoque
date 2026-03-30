@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Estoque Avançado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 flex h-screen overflow-hidden text-slate-800">
+    <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-2xl">
+        <div class="p-6 text-center border-b border-slate-700">
+            <h1 class="text-2xl font-black tracking-wider text-emerald-400">ESTOQUE<span class="text-white">PRO</span></h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="/painel" class="block py-3 px-4 rounded bg-emerald-600 hover:bg-emerald-500 font-semibold transition">Painel Geral</a>
+            <a href="/exportar_csv" class="block py-3 px-4 rounded hover:bg-slate-800 transition">Exportar Dados</a>
+        </nav>
+        <div class="p-4 border-t border-slate-700">
+            <p class="text-sm text-slate-400 mb-2">Usuário: {{ usuario }}</p>
+            <a href="/sair" class="block text-center bg-red-600 hover:bg-red-500 py-2 rounded font-bold transition">Sair</a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="bg-white p-6 shadow-sm flex justify-between items-center">
+            <h2 class="text-2xl font-bold">Visão Geral do Patrimônio</h2>
+        </header>
+        
+        <div class="p-8">
+            {% with mensagens = get_flashed_messages(with_categories=true) %}
+                {% if mensagens %}
+                    {% for categoria_mensagem, texto_mensagem in mensagens %}
+                        <div class="p-4 mb-6 rounded font-semibold text-white {% if categoria_mensagem == 'sucesso' %}bg-emerald-500{% else %}bg-red-500{% endif %}">
+                            {{ texto_mensagem }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            {% block conteudo_principal %}{% endblock %}
+        </div>
+    </main>
+</body>
+</html>
